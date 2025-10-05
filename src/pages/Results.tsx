@@ -1,11 +1,12 @@
 // src/pages/Results.tsx
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/lib/supabaseClient";
 import { PersonaData, HybridPersonaData } from "@/types/quiz";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
 import { Loader2, Download, Share2, Home } from "lucide-react";
 
 // Tipe data untuk hasil gabungan
@@ -21,6 +22,129 @@ const Results = () => {
   const [searchParams] = useSearchParams();
   const [result, setResult] = useState<FullResult | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
+
+  // Fungsi untuk download PDF
+  const downloadPDF = async () => {
+    if (!resultsRef.current || !result) return;
+    
+    setIsDownloading(true);
+    
+    try {
+      // Load libraries dinamis
+      const html2canvas = await import('html2canvas');
+      const jsPDF = await import('jspdf');
+      
+      // Capture element sebagai canvas
+      const canvas = await html2canvas.default(resultsRef.current, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff'
+      });
+      
+      // Convert canvas ke image
+      const imgData = canvas.toDataURL('image/png');
+      
+      // Create PDF
+      const pdf = new jsPDF.jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
+      const imgWidth = 210;
+      const pageHeight = 295;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      
+      let position = 0;
+      
+      // Add first page
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+      
+      // Add additional pages if needed
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+      
+      // Download PDF
+      const fileName = `GenZ-Resilience-${result.hybridPersona?.name || result.primaryPersona.name}-Results.pdf`;
+      pdf.save(fileName);
+      
+      toast({
+        title: "PDF berhasil didownload!",
+        description: "File PDF hasil tes telah tersimpan di perangkat Anda.",
+      });
+      
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: "Gagal download PDF",
+        description: "Terjadi kesalahan saat membuat PDF. Silakan coba lagi.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  // Fungsi untuk share results
+  const shareResults = async () => {
+    if (!result) return;
+    
+    setIsSharing(true);
+    
+    try {
+      const shareData = {
+        title: `GenZ Resilience Hub - Hasil Tes Kepribadian`,
+        text: `Saya adalah ${result.hybridPersona?.name || `The ${result.primaryPersona.name}`}! Temukan persona kepribadian Anda di GenZ Resilience Hub.`,
+        url: window.location.href
+      };
+      
+      // Check if Web Share API is supported
+      if (navigator.share) {
+        await navigator.share(shareData);
+        toast({
+          title: "Berhasil dibagikan!",
+          description: "Hasil tes telah dibagikan.",
+        });
+      } else {
+        // Fallback: copy to clipboard
+        await navigator.clipboard.writeText(`${shareData.text}\n\n${shareData.url}`);
+        toast({
+          title: "Link berhasil disalin!",
+          description: "Link hasil tes telah disalin ke clipboard.",
+        });
+      }
+    } catch (error) {
+      console.error('Error sharing:', error);
+      // Fallback: copy to clipboard
+      try {
+        const fallbackText = `Saya adalah ${result.hybridPersona?.name || `The ${result.primaryPersona.name}`}! Temukan persona kepribadian Anda di GenZ Resilience Hub.\n\n${window.location.href}`;
+        await navigator.clipboard.writeText(fallbackText);
+        toast({
+          title: "Link berhasil disalin!",
+          description: "Link hasil tes telah disalin ke clipboard.",
+        });
+      } catch (clipboardError) {
+        toast({
+          title: "Gagal membagikan",
+          description: "Terjadi kesalahan saat membagikan hasil. Silakan coba lagi.",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsSharing(false);
+    }
+  };
 
   useEffect(() => {
     const resultId = searchParams.get('id');
@@ -97,7 +221,7 @@ const Results = () => {
 
   return (
     <div className="min-h-screen bg-gradient-hero py-8 lg:py-16">
-      <div className="container mx-auto px-4 max-w-4xl space-y-8">
+      <div ref={resultsRef} className="container mx-auto px-4 max-w-4xl space-y-8">
         {/* Header Hasil */}
         <div className="text-center space-y-4 animate-fade-in">
            <span className="text-7xl">{hybridPersona?.emoji || primaryPersona.emoji}</span>
@@ -133,9 +257,36 @@ const Results = () => {
         {/* Tombol Aksi */}
         <Card className="p-6 shadow-card border-2 animate-fade-in">
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button size="lg" className="flex-1"><Download className="mr-2" /> Download PDF</Button>
-            <Button size="lg" variant="outline" className="flex-1"><Share2 className="mr-2" /> Bagikan Hasil</Button>
-            <Button size="lg" variant="ghost" className="flex-1" onClick={() => navigate('/')}><Home className="mr-2" /> Kembali</Button>
+            <Button 
+              size="lg" 
+              className="flex-1" 
+              onClick={downloadPDF}
+              disabled={isDownloading}
+            >
+              {isDownloading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="mr-2" />
+              )}
+              {isDownloading ? 'Membuat PDF...' : 'Download PDF'}
+            </Button>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="flex-1"
+              onClick={shareResults}
+              disabled={isSharing}
+            >
+              {isSharing ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Share2 className="mr-2" />
+              )}
+              {isSharing ? 'Membagikan...' : 'Bagikan Hasil'}
+            </Button>
+            <Button size="lg" variant="ghost" className="flex-1" onClick={() => navigate('/')}>
+              <Home className="mr-2" /> Kembali
+            </Button>
           </div>
         </Card>
       </div>

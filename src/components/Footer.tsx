@@ -15,14 +15,11 @@ export default function Footer() {
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
             <nav className="flex gap-4">
-              <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
+              <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Home
               </Link>
-              <Link to="/test" className="text-sm text-muted-foreground hover:text-foreground">
-                Take Test
-              </Link>
-              <Link to="/results" className="text-sm text-muted-foreground hover:text-foreground">
-                Results
+              <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                About Us
               </Link>
             </nav>
 

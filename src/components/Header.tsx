@@ -30,7 +30,7 @@ const NavLink = ({
   <Link
     to={to}
     onClick={onClick}
-    className="block px-3 py-2 rounded-md text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+    className="block px-4 py-3 rounded-lg text-base font-medium text-foreground hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary transition-all duration-200 active:scale-95"
   >
     {children}
   </Link>
@@ -58,19 +58,19 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo and Title */}
-          <div className="flex items-center">
-            <Link to="/" className="flex items-center gap-3">
+          <div className="flex items-center min-w-0">
+            <Link to="/" className="flex items-center gap-2 sm:gap-3 min-w-0">
               <img
                 src="/images/logo.png"
                 alt="GenZ Resilience logo"
-                className="w-10 h-10 rounded-md object-cover shadow-md"
+                className="w-8 h-8 sm:w-10 sm:h-10 rounded-md object-cover shadow-md flex-shrink-0"
               />
-              <span className="text-lg font-semibold text-foreground">
+              <span className="text-base sm:text-lg font-semibold text-foreground truncate">
                 test
                 <span className="ml-1" style={{ color: "hsl(var(--primary))" }}>
                   GenZ
                 </span>
-                .com
+                <span className="hidden xs:inline">.com</span>
               </span>
             </Link>
           </div>
@@ -78,14 +78,20 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex md:items-center md:space-x-4">
             <Link
-              className="px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground"
+              className="px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               to="/"
             >
               Home
             </Link>
             <Link
-              className="px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground"
-              to="/test"
+              className="px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              to="/about"
+            >
+              About Us
+            </Link>
+            <Link
+              className="px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              to="/pre-test"
             >
               Take Test
             </Link>
@@ -152,11 +158,12 @@ export default function Header() {
             <div className="md:hidden">
               <button
                 onClick={() => setOpen((v) => !v)}
-                aria-label="Toggle menu"
-                className="inline-flex items-center justify-center p-2 rounded-md text-foreground hover:bg-slate-100 dark:hover:bg-slate-800"
+                aria-label={open ? "Close menu" : "Open menu"}
+                aria-expanded={open}
+                className="inline-flex items-center justify-center p-2 rounded-lg text-foreground hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200 touch-target active:scale-95"
               >
                 <svg
-                  className="h-6 w-6"
+                  className={`h-6 w-6 transition-transform duration-200 ${open ? 'rotate-90' : 'rotate-0'}`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -185,27 +192,52 @@ export default function Header() {
 
       {/* Mobile menu */}
       {open && (
-        <div className="md:hidden border-t border-border bg-white dark:bg-slate-900">
-          <div className="px-2 pt-2 pb-3 space-y-1">
+        <div className="md:hidden border-t border-border bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm mobile-menu-enter">
+          <div className="px-2 pt-2 pb-4 space-y-1">
+            {/* Navigation Links */}
             <NavLink to="/" onClick={closeMobileMenu}>
               Home
+            </NavLink>
+            <NavLink to="/about" onClick={closeMobileMenu}>
+              About Us
             </NavLink>
             <NavLink to="/test" onClick={closeMobileMenu}>
               Take Test
             </NavLink>
-            <div className="px-3 py-2">
+            
+            {/* User Menu for Mobile */}
+            {session && (
+              <>
+                <div className="border-t border-border my-2"></div>
+                <NavLink to="/profile" onClick={closeMobileMenu}>
+                  Profile
+                </NavLink>
+                <NavLink to="/history" onClick={closeMobileMenu}>
+                  Riwayat Tes
+                </NavLink>
+              </>
+            )}
+
+            {/* Auth Section */}
+            <div className="px-3 py-3 border-t border-border mt-3">
               {session ? (
-                <Button
-                  onClick={() => {
-                    handleLogout();
-                    closeMobileMenu();
-                  }}
-                  className="w-full justify-center"
-                >
-                  Log Out
-                </Button>
+                <div className="space-y-3">
+                  <div className="text-sm text-muted-foreground">
+                    Signed in as <span className="font-medium text-foreground">{user?.email}</span>
+                  </div>
+                  <Button
+                    onClick={() => {
+                      handleLogout();
+                      closeMobileMenu();
+                    }}
+                    className="w-full justify-center"
+                    variant="destructive"
+                  >
+                    Log Out
+                  </Button>
+                </div>
               ) : (
-                <div className="flex items-center gap-2">
+                <div className="space-y-2">
                   <Button
                     variant="ghost"
                     asChild

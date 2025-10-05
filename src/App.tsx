@@ -11,6 +11,7 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 // Pages
 import Index from "./pages/Index";
+import About from "./pages/About";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import PreTest from "./pages/PreTest";
@@ -32,6 +33,7 @@ const App = () => (
           {/* Rute dengan Header */}
           <Route element={<MainLayout />}>
             <Route path="/" element={<Index />} />
+            <Route path="/about" element={<About />} />
 
             {/* Rute yang dilindungi: hanya bisa diakses jika profil lengkap */}
             <Route element={<ProtectedRoute />}>
