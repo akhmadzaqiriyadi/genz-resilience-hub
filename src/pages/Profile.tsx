@@ -79,7 +79,7 @@ const Profile = () => {
       if (error) throw error;
       
       toast({ title: "Profil berhasil diperbarui!" });
-      navigate("/test");
+      navigate("/pre-test");
     } catch (error: any) {
       toast({ variant: "destructive", title: "Update gagal", description: error.message });
     } finally {

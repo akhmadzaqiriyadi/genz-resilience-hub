@@ -16,9 +16,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, User as UserIcon } from "lucide-react";
+import { LogOut, User as UserIcon, History as HistoryIcon } from "lucide-react";
 
-const NavLink = ({ to, children, onClick }: { to: string; children: React.ReactNode, onClick?: () => void }) => (
+const NavLink = ({
+  to,
+  children,
+  onClick,
+}: {
+  to: string;
+  children: React.ReactNode;
+  onClick?: () => void;
+}) => (
   <Link
     to={to}
     onClick={onClick}
@@ -52,19 +60,33 @@ export default function Header() {
           {/* Logo and Title */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-3">
-              <img src="/images/logo.png" alt="GenZ Resilience logo" className="w-10 h-10 rounded-md object-cover shadow-md" />
+              <img
+                src="/images/logo.png"
+                alt="GenZ Resilience logo"
+                className="w-10 h-10 rounded-md object-cover shadow-md"
+              />
               <span className="text-lg font-semibold text-foreground">
-                test<span className="ml-1" style={{ color: 'hsl(var(--primary))' }}>GenZ</span>.com
+                test
+                <span className="ml-1" style={{ color: "hsl(var(--primary))" }}>
+                  GenZ
+                </span>
+                .com
               </span>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex md:items-center md:space-x-4">
-            <Link className="px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground" to="/">
+            <Link
+              className="px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground"
+              to="/"
+            >
               Home
             </Link>
-            <Link className="px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground" to="/test">
+            <Link
+              className="px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground"
+              to="/test"
+            >
               Take Test
             </Link>
           </nav>
@@ -75,7 +97,10 @@ export default function Header() {
               {session ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                    <Button
+                      variant="ghost"
+                      className="relative h-10 w-10 rounded-full"
+                    >
                       <Avatar className="h-10 w-10">
                         <AvatarFallback className="bg-primary text-primary-foreground">
                           {getInitials(user?.email)}
@@ -86,14 +111,24 @@ export default function Header() {
                   <DropdownMenuContent className="w-56" align="end" forceMount>
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-1">
-                        <p className="text-xs leading-none text-muted-foreground">Signed in as</p>
-                        <p className="text-sm font-medium leading-none truncate">{user?.email}</p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          Signed in as
+                        </p>
+                        <p className="text-sm font-medium leading-none truncate">
+                          {user?.email}
+                        </p>
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => navigate('/profile')}>
-                        <UserIcon className="mr-2 h-4 w-4" />
-                        <span>Profile</span>
+                    <DropdownMenuItem onClick={() => navigate("/profile")}>
+                      <UserIcon className="mr-2 h-4 w-4" />
+                      <span>Profile</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate("/history")}>
+                      {" "}
+                      {/* <-- Tambahkan item ini */}
+                      <HistoryIcon className="mr-2 h-4 w-4" />
+                      <span>Riwayat Tes</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleLogout}>
                       <LogOut className="mr-2 h-4 w-4" />
@@ -103,12 +138,12 @@ export default function Header() {
                 </DropdownMenu>
               ) : (
                 <div className="flex items-center gap-2">
-                    <Button variant="ghost" asChild>
-                        <Link to="/login">Masuk</Link>
-                    </Button>
-                    <Button asChild>
-                        <Link to="/register">Daftar</Link>
-                    </Button>
+                  <Button variant="ghost" asChild>
+                    <Link to="/login">Masuk</Link>
+                  </Button>
+                  <Button asChild>
+                    <Link to="/register">Daftar</Link>
+                  </Button>
                 </div>
               )}
             </div>
@@ -120,11 +155,26 @@ export default function Header() {
                 aria-label="Toggle menu"
                 className="inline-flex items-center justify-center p-2 rounded-md text-foreground hover:bg-slate-100 dark:hover:bg-slate-800"
               >
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
                   {open ? (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   ) : (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 6h16M4 12h16M4 18h16"
+                    />
                   )}
                 </svg>
               </button>
@@ -137,19 +187,39 @@ export default function Header() {
       {open && (
         <div className="md:hidden border-t border-border bg-white dark:bg-slate-900">
           <div className="px-2 pt-2 pb-3 space-y-1">
-            <NavLink to="/" onClick={closeMobileMenu}>Home</NavLink>
-            <NavLink to="/test" onClick={closeMobileMenu}>Take Test</NavLink>
+            <NavLink to="/" onClick={closeMobileMenu}>
+              Home
+            </NavLink>
+            <NavLink to="/test" onClick={closeMobileMenu}>
+              Take Test
+            </NavLink>
             <div className="px-3 py-2">
               {session ? (
-                 <Button onClick={() => { handleLogout(); closeMobileMenu(); }} className="w-full justify-center">Log Out</Button>
+                <Button
+                  onClick={() => {
+                    handleLogout();
+                    closeMobileMenu();
+                  }}
+                  className="w-full justify-center"
+                >
+                  Log Out
+                </Button>
               ) : (
                 <div className="flex items-center gap-2">
-                    <Button variant="ghost" asChild className="w-full justify-center">
-                        <Link to="/login" onClick={closeMobileMenu}>Masuk</Link>
-                    </Button>
-                    <Button asChild className="w-full justify-center">
-                        <Link to="/register" onClick={closeMobileMenu}>Daftar</Link>
-                    </Button>
+                  <Button
+                    variant="ghost"
+                    asChild
+                    className="w-full justify-center"
+                  >
+                    <Link to="/login" onClick={closeMobileMenu}>
+                      Masuk
+                    </Link>
+                  </Button>
+                  <Button asChild className="w-full justify-center">
+                    <Link to="/register" onClick={closeMobileMenu}>
+                      Daftar
+                    </Link>
+                  </Button>
                 </div>
               )}
             </div>

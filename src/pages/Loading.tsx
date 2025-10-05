@@ -1,67 +1,67 @@
+// src/pages/Loading.tsx
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { processTestAnswers } from "@/utils/calculateResults";
+import { Answer } from "@/types/quiz";
 
 const Loading = () => {
   const navigate = useNavigate();
-
-  const messages = [
-    "Menganalisis jawabanmu...",
-    "Menghitung skor resiliensi...",
-    "Menyiapkan insights personalmu...",
-    "Menyusun tips khusus untukmu..."
-  ];
-
-  const [currentMessage, setCurrentMessage] = useState(0);
+  const { user } = useAuth();
+  const [message, setMessage] = useState("Menganalisis jawabanmu...");
 
   useEffect(() => {
-    // Cycle through messages
-    const messageInterval = setInterval(() => {
-      setCurrentMessage((prev) => (prev + 1) % messages.length);
-    }, 1000);
+    const calculateAndSave = async () => {
+      const answersJson = sessionStorage.getItem('testAnswers');
+      
+      if (!answersJson || !user) {
+        // Jika tidak ada jawaban atau pengguna, kembali ke awal
+        navigate('/');
+        return;
+      }
 
-    // Navigate to results after 4 seconds
-    const timer = setTimeout(() => {
-      navigate('/results');
-    }, 4000);
+      const answers: Answer[] = JSON.parse(answersJson);
 
-    return () => {
-      clearInterval(messageInterval);
-      clearTimeout(timer);
+      try {
+        setMessage("Menghitung persona unikmu...");
+        // Panggil fungsi baru untuk memproses jawaban dan menyimpan ke DB
+        const resultId = await processTestAnswers(answers, user.id);
+
+        setMessage("Menyiapkan hasil akhir...");
+        
+        // Hapus data dari session storage setelah berhasil disimpan
+        sessionStorage.removeItem('testAnswers');
+
+        // Arahkan ke halaman hasil dengan ID hasil tes yang baru
+        setTimeout(() => {
+          navigate(`/results?id=${resultId}`);
+        }, 1000);
+
+      } catch (error) {
+        console.error("Failed to process results:", error);
+        // Arahkan ke halaman error atau kembali ke test
+        navigate('/test');
+      }
     };
-  }, [navigate]);
+
+    calculateAndSave();
+  }, [navigate, user]);
 
   return (
     <div className="min-h-screen bg-gradient-hero flex items-center justify-center px-4">
       <div className="text-center space-y-8 animate-fade-in">
-        {/* Animated Loader */}
         <div className="relative">
-          <div className="w-24 h-24 mx-auto">
-            <Loader2 className="w-24 h-24 text-primary animate-spin" />
-          </div>
-          <div className="absolute inset-0 w-24 h-24 mx-auto rounded-full bg-gradient-primary opacity-20 blur-xl animate-pulse" />
+          <Loader2 className="w-24 h-24 text-primary animate-spin" />
         </div>
-
-        {/* Messages */}
         <div className="space-y-4">
           <h2 className="text-3xl font-bold text-foreground">
-            Oke, beres!
+            Sebentar ya...
           </h2>
-          <p className="text-xl text-muted-foreground animate-pulse">
-            {messages[currentMessage]}
+          <p className="text-xl text-muted-foreground">
+            {message}
           </p>
-        </div>
-
-        {/* Progress dots */}
-        <div className="flex gap-2 justify-center">
-          {messages.map((_, index) => (
-            <div
-              key={index}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                index === currentMessage ? 'bg-primary w-8' : 'bg-muted'
-              }`}
-            />
-          ))}
         </div>
       </div>
     </div>

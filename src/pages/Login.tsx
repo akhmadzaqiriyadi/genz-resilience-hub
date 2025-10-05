@@ -43,7 +43,7 @@ const Login = () => {
       
       // --- PERUBAHAN DI SINI ---
       // Arahkan ke rute yang dilindungi untuk memicu pengecekan profil.
-      navigate("/test"); 
+      navigate("/pre-test"); 
       // --- AKHIR PERUBAHAN ---
 
     } catch (error: any) {

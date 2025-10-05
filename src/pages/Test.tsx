@@ -1,49 +1,74 @@
-import { useState } from "react";
+// src/pages/Test.tsx
+
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import QuestionCard from "@/components/QuestionCard";
-import { questions } from "@/data/questions";
-import { Answer } from "@/types/quiz";
+import { Answer, Question, AnswerValue } from "@/types/quiz";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
+import { supabase } from "@/lib/supabaseClient";
 
 const Test = () => {
   const navigate = useNavigate();
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [loading, setLoading] = useState(true);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Answer[]>([]);
 
-  const currentQuestion = questions[currentQuestionIndex];
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('questions')
+        .select('*')
+        .order('id', { ascending: true });
+      
+      if (error) {
+        console.error("Error fetching questions:", error);
+        // Mungkin tampilkan pesan error ke pengguna di sini
+      } else {
+        setQuestions(data);
+      }
+      setLoading(false);
+    };
 
-  const handleAnswer = (value: number) => {
-    const newAnswers = [...answers, { questionId: currentQuestion.id, value }];
+    fetchQuestions();
+  }, []);
+
+  const handleAnswer = (value: AnswerValue) => {
+    const newAnswers = [...answers, { questionId: questions[currentQuestionIndex].id, value }];
     setAnswers(newAnswers);
 
-    // Check if this was the last question
     if (currentQuestionIndex === questions.length - 1) {
-      // Store answers in sessionStorage
       sessionStorage.setItem('testAnswers', JSON.stringify(newAnswers));
-      // Navigate to loading page
       navigate('/loading');
     } else {
-      // Move to next question
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
 
   const handleBack = () => {
     if (currentQuestionIndex > 0) {
-      // Remove last answer
-      const newAnswers = answers.slice(0, -1);
-      setAnswers(newAnswers);
+      setAnswers(answers.slice(0, -1));
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     } else {
-      navigate('/');
+      navigate('/pre-test'); // Kembali ke halaman pre-test
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-16 w-16 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  const currentQuestion = questions[currentQuestionIndex];
 
   return (
     <div className="min-h-screen bg-gradient-hero py-8 lg:py-16">
       <div className="container mx-auto">
-        {/* Back Button */}
         <div className="mb-8">
           <Button
             variant="ghost"
@@ -55,13 +80,18 @@ const Test = () => {
           </Button>
         </div>
 
-        {/* Question */}
-        <QuestionCard
-          question={currentQuestion}
-          currentIndex={currentQuestionIndex}
-          totalQuestions={questions.length}
-          onAnswer={handleAnswer}
-        />
+        {currentQuestion ? (
+          <QuestionCard
+            question={currentQuestion}
+            currentIndex={currentQuestionIndex}
+            totalQuestions={questions.length}
+            onAnswer={handleAnswer}
+          />
+        ) : (
+          <div className="text-center">
+            <p>Tidak ada pertanyaan yang ditemukan.</p>
+          </div>
+        )}
       </div>
     </div>
   );

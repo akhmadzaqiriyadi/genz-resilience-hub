@@ -13,10 +13,12 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import PreTest from "./pages/PreTest";
 import Test from "./pages/Test";
 import Loading from "./pages/Loading";
 import Results from "./pages/Results";
 import Profile from "./pages/Profile";
+import History from "./pages/History";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,11 +32,13 @@ const App = () => (
           {/* Rute dengan Header */}
           <Route element={<MainLayout />}>
             <Route path="/" element={<Index />} />
-            
+
             {/* Rute yang dilindungi: hanya bisa diakses jika profil lengkap */}
             <Route element={<ProtectedRoute />}>
+              <Route path="/pre-test" element={<PreTest />} />
               <Route path="/test" element={<Test />} />
               <Route path="/results" element={<Results />} />
+              <Route path="/history" element={<History />} />
             </Route>
 
             {/* Halaman profil berada di sini, di dalam MainLayout tapi di luar ProtectedRoute */}
@@ -44,6 +48,7 @@ const App = () => (
           {/* Rute tanpa Header (full screen) */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/loading" element={<Loading />} />
 
           {/* Rute Not Found */}
           <Route path="*" element={<NotFound />} />
