@@ -42,9 +42,9 @@ const Results = () => {
       result.hybridPersona?.emoji || result.primaryPersona.emoji;
     const personaName =
       result.hybridPersona?.name || result.primaryPersona.name;
-    return `${personaEmoji} Gue ${personaName} ternyata! 
+    return `POV: Ternyata persona gue ${personaEmoji} The ${personaName}.
 
-Lo persona apa? Gas coba tes di sini! �
+Kira-kira relate gak ya? Coba tes & liat punya lo! 👀
 
 https://www.testgenz.com/`;
   };
@@ -207,13 +207,9 @@ https://www.testgenz.com/`;
       // Share data yang aman (tanpa hasil pribadi)
       const shareData = {
         title: `GenZ Resilience Hub - Tes Kepribadian`,
-        text: `${personaEmoji} Gue ${
-          result.hybridPersona?.name
-            ? `${result.hybridPersona.name}`
-            : `${result.primaryPersona.name}`
-        } ternyata! 
+        text: `POV: Ternyata persona gue ${personaEmoji} The ${personaName}.
 
-        Lo persona apa? Gas coba tes di sini! 🚀`,
+Kira-kira relate gak ya? Coba tes & liat punya lo! �`,
         url: "https://www.testgenz.com/", // Link ke homepage, bukan hasil pribadi
       };
 
@@ -243,11 +239,11 @@ https://www.testgenz.com/`;
         const personaEmoji =
           result.hybridPersona?.emoji || result.primaryPersona.emoji;
 
-        const fallbackText = `${personaEmoji} Gue ${
-          result.hybridPersona?.name || result.primaryPersona.name
-        } ternyata! 
+        const fallbackText = `POV: Ternyata persona gue ${personaEmoji} The ${
+          personaName
+        }.
 
-Lo persona apa? Gas coba tes di sini! �
+Kira-kira relate gak ya? Coba tes & liat punya lo! 👀
 
 https://www.testgenz.com/`;
 

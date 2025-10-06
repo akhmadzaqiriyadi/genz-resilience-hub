@@ -78,13 +78,13 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-hero">
       {/* Hero Section */}
-      <section className="container mx-auto px-2 pt-16 pb-20">
+      <section className="container mx-auto px-4 pt-16 pb-20">
         <div className="max-w-7xl mx-auto">
           <div className="text-center space-y-8">
             {/* Hero Heading */}
             <div className="space-y-6 animate-fade-in">
-              <h1 className="text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-slate-900 leading-tight">
-                Stop Galau. <span className="text-sky-400">Pahami Dirimu,</span>
+              <h1 className="text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-bold text-slate-900 leading-tight">
+                Stop Galau. <br /> <span className="text-sky-400">Pahami Dirimu,</span>
                 <br />
                 Tentukan Masa Depanmu.
               </h1>
