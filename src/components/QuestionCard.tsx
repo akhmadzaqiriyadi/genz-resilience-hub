@@ -21,7 +21,7 @@ const options: { value: AnswerValue; labelKey: keyof Question }[] = [
 
 const QuestionCard = ({ question, currentIndex, totalQuestions, onAnswer }: QuestionCardProps) => {
   return (
-    <div className="w-full max-w-3xl mx-auto px-4 animate-fade-in">
+    <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 animate-fade-in">
       {/* Progress */}
       <div className="mb-8">
         <div className="flex justify-between text-sm text-muted-foreground mb-2">
@@ -37,15 +37,15 @@ const QuestionCard = ({ question, currentIndex, totalQuestions, onAnswer }: Ques
       </div>
 
       {/* Question Card */}
-      <Card className="p-8 shadow-card border-2">
-        <div className="space-y-8">
+      <Card className="p-4 sm:p-6 lg:p-8 shadow-card border-2">
+        <div className="space-y-6 sm:space-y-8">
           <div>
             <div className="inline-block mb-4">
               <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-semibold uppercase">
                 Bagian {question.part}
               </span>
             </div>
-            <h2 className="text-2xl lg:text-3xl font-bold text-foreground leading-relaxed">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground leading-relaxed">
               {question.question_text}
             </h2>
           </div>
@@ -56,11 +56,13 @@ const QuestionCard = ({ question, currentIndex, totalQuestions, onAnswer }: Ques
                 key={option.value}
                 variant="outline"
                 size="lg"
-                className="justify-start text-left h-auto py-4 px-6 font-semibold text-base transition-all hover:scale-[1.02] border-2 hover:bg-primary/10 hover:border-primary hover:text-primary"
+                className="justify-start text-left h-auto py-3 px-4 sm:py-4 sm:px-6 font-semibold text-sm sm:text-base transition-all hover:scale-[1.02] border-2 hover:bg-primary/10 hover:border-primary hover:text-primary w-full whitespace-normal min-h-[3rem] sm:min-h-[3.5rem]"
                 onClick={() => onAnswer(option.value)}
               >
-                <span className="mr-4 font-bold text-primary">{option.value}.</span>
-                <span>{question[option.labelKey]}</span>
+                <div className="flex items-start gap-2 sm:gap-4 w-full">
+                  <span className="font-bold text-primary flex-shrink-0 mt-0.5">{option.value}.</span>
+                  <span className="text-left leading-relaxed flex-1">{question[option.labelKey]}</span>
+                </div>
               </Button>
             ))}
           </div>

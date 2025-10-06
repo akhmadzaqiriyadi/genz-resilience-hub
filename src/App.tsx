@@ -21,6 +21,8 @@ import Results from "./pages/Results";
 import Profile from "./pages/Profile";
 import History from "./pages/History";
 import NotFound from "./pages/NotFound";
+import ForgotPassword from "./pages/ForgotPassword";
+import UpdatePassword from "./pages/UpdatePassword";
 
 const queryClient = new QueryClient();
 
@@ -46,12 +48,12 @@ const App = () => (
             {/* Halaman profil berada di sini, di dalam MainLayout tapi di luar ProtectedRoute */}
             <Route path="/profile" element={<Profile />} />
           </Route>
-
           {/* Rute tanpa Header (full screen) */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/loading" element={<Loading />} />
-
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/update-password" element={<UpdatePassword />} />
           {/* Rute Not Found */}
           <Route path="*" element={<NotFound />} />
         </Routes>
