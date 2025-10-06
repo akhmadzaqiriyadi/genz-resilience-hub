@@ -1,7 +1,7 @@
 // src/pages/Profile.tsx
 
 import { supabase } from "@/lib/supabaseClient";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -20,70 +20,61 @@ import { Badge } from "@/components/ui/badge";
 const profileSchema = z.object({
   username: z.string().min(3, { message: "Username minimal 3 karakter." }),
   full_name: z.string().min(3, { message: "Nama lengkap minimal 3 karakter." }),
+  institution: z.string().optional(),
+  major: z.string().optional(),
+  domicile: z.string().optional(),
 });
 
 const Profile = () => {
-  const { user, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading, refreshProfile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
-  const [role, setRole] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       username: "",
       full_name: "",
+      institution: "",
+      major: "",
+      domicile: "",
     },
   });
 
   useEffect(() => {
-    if (user) {
-      getProfile();
+    if (profile) {
+      form.setValue('username', profile.username || '');
+      form.setValue('full_name', profile.full_name || '');
+      form.setValue('institution', profile.institution || '');
+      form.setValue('major', profile.major || '');
+      form.setValue('domicile', profile.domicile || '');
     }
-  }, [user]);
-
-  const getProfile = async () => {
-    setLoading(true);
-    try {
-      const { data, error, status } = await supabase
-        .from('profiles')
-        .select(`username, full_name, role`)
-        .eq('id', user!.id)
-        .single();
-      
-      if (error && status !== 406) throw error;
-
-      if (data) {
-        form.setValue('username', data.username || '');
-        form.setValue('full_name', data.full_name || '');
-        setRole(data.role || 'user'); // <-- Mengambil dan menyimpan role
-      }
-    } catch (error: any) {
-      toast({ variant: "destructive", title: "Gagal memuat profil", description: error.message });
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [profile, form]);
 
   const onSubmit = async (values: z.infer<typeof profileSchema>) => {
-    setLoading(true);
+    setIsSubmitting(true);
     try {
       const { error } = await supabase.from("profiles").upsert({
         id: user!.id,
         username: values.username,
         full_name: values.full_name,
+        institution: values.institution,
+        major: values.major,
+        domicile: values.domicile,
         updated_at: new Date().toISOString(),
       });
 
       if (error) throw error;
       
+      await refreshProfile(); 
+
       toast({ title: "Profil berhasil diperbarui!" });
       navigate("/pre-test");
     } catch (error: any) {
       toast({ variant: "destructive", title: "Update gagal", description: error.message });
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
   
@@ -92,9 +83,8 @@ const Profile = () => {
     return email.substring(0, 2).toUpperCase();
   };
 
-
   if (authLoading) {
-     return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin" /></div>;
+     return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin h-16 w-16 text-primary" /></div>;
   }
 
   return (
@@ -124,8 +114,8 @@ const Profile = () => {
                  <div className="space-y-2">
                   <Label>Role</Label>
                   <div>
-                    {role ? (
-                      <Badge variant="outline" className="capitalize text-lg py-1 px-4">{role}</Badge>
+                    {profile?.role ? (
+                      <Badge variant="outline" className="capitalize text-lg py-1 px-4">{profile.role}</Badge>
                     ) : (
                       <div className="h-10 w-24 bg-muted animate-pulse rounded-full" />
                     )}
@@ -158,8 +148,47 @@ const Profile = () => {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? <Loader2 className="animate-spin" /> : "Simpan & Lanjutkan"}
+              <FormField
+                control={form.control}
+                name="institution"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Asal Kampus / Instansi</FormLabel>
+                    <FormControl>
+                      <Input placeholder="cth: Universitas Indonesia" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="major"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Jurusan</FormLabel>
+                    <FormControl>
+                      <Input placeholder="cth: Ilmu Komunikasi" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="domicile"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Domisili</FormLabel>
+                    <FormControl>
+                      <Input placeholder="cth: Jakarta" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? <Loader2 className="animate-spin" /> : "Simpan & Lanjutkan"}
               </Button>
             </form>
           </Form>

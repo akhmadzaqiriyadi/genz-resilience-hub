@@ -33,20 +33,26 @@ const Login = () => {
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
     setLoading(true);
     setError(null);
+    console.log('🔐 Attempting login with email:', values.email);
+    
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Login error:', error);
+        throw error;
+      }
       
-      // --- PERUBAHAN DI SINI ---
+      console.log('✅ Login successful:', { userId: data.user?.id, email: data.user?.email });
+      
       // Arahkan ke rute yang dilindungi untuk memicu pengecekan profil.
       navigate("/pre-test"); 
-      // --- AKHIR PERUBAHAN ---
 
     } catch (error: any) {
+      console.error('❌ Login failed:', error.message);
       setError(error.message || "Login gagal. Periksa kembali email dan password Anda.");
     } finally {
       setLoading(false);
