@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Question, AnswerValue } from "@/types/quiz"; // Perbarui impor
+import { Question, AnswerValue } from "@/types/quiz";
 
 interface QuestionCardProps {
   question: Question;
@@ -11,15 +11,21 @@ interface QuestionCardProps {
   onAnswer: (value: AnswerValue) => void;
 }
 
-// Opsi jawaban sekarang dinamis
-const options: { value: AnswerValue; labelKey: keyof Question }[] = [
-  { value: "A", labelKey: "option_a_text" },
-  { value: "B", labelKey: "option_b_text" },
-  { value: "C", labelKey: "option_c_text" },
-  { value: "D", labelKey: "option_d_text" },
-];
-
 const QuestionCard = ({ question, currentIndex, totalQuestions, onAnswer }: QuestionCardProps) => {
+  // BARU: Kita definisikan semua kemungkinan opsi di sini
+  const potentialOptions: { value: AnswerValue; text: string | undefined | null }[] = [
+    { value: "A", text: question.option_a_text },
+    { value: "B", text: question.option_b_text },
+    { value: "C", text: question.option_c_text },
+    { value: "D", text: question.option_d_text },
+  ];
+
+  // BARU: Kita saring dan hanya ambil opsi yang punya teks
+  const availableOptions = potentialOptions.filter(opt => opt.text);
+  
+  // Ambil teks pertanyaan dari field yang tersedia
+  const questionText = question.question_text || question.text;
+
   return (
     <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 animate-fade-in">
       {/* Progress */}
@@ -40,18 +46,21 @@ const QuestionCard = ({ question, currentIndex, totalQuestions, onAnswer }: Ques
       <Card className="p-4 sm:p-6 lg:p-8 shadow-card border-2">
         <div className="space-y-6 sm:space-y-8">
           <div>
-            <div className="inline-block mb-4">
-              <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-semibold uppercase">
-                Bagian {question.part}
-              </span>
-            </div>
+            {question.part && (
+              <div className="inline-block mb-4">
+                <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-semibold uppercase">
+                  Bagian {question.part}
+                </span>
+              </div>
+            )}
             <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground leading-relaxed">
-              {question.question_text}
+              {questionText}
             </h2>
           </div>
 
           <div className="grid gap-3">
-            {options.map((option) => (
+            {/* BARU: Kita map dari opsi yang sudah disaring */}
+            {availableOptions.map((option) => (
               <Button
                 key={option.value}
                 variant="outline"
@@ -61,7 +70,7 @@ const QuestionCard = ({ question, currentIndex, totalQuestions, onAnswer }: Ques
               >
                 <div className="flex items-start gap-2 sm:gap-4 w-full">
                   <span className="font-bold text-primary flex-shrink-0 mt-0.5">{option.value}.</span>
-                  <span className="text-left leading-relaxed flex-1">{question[option.labelKey]}</span>
+                  <span className="text-left leading-relaxed flex-1">{option.text}</span>
                 </div>
               </Button>
             ))}

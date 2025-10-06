@@ -23,7 +23,7 @@ export default function Footer() {
               </Link>
             </nav>
 
-            <div className="text-sm text-muted-foreground">© {new Date().getFullYear()} testGenZ.com. All rights reserved.</div>
+            <div className="text-sm text-muted-foreground">© {new Date().getFullYear()} testGenZ.com All rights reserved.</div>
           </div>
         </div>
       </div>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import { processTestAnswers } from "@/utils/calculateResults";
 import { Answer } from "@/types/quiz";
 
@@ -15,33 +15,49 @@ const Loading = () => {
   useEffect(() => {
     const calculateAndSave = async () => {
       const answersJson = sessionStorage.getItem('testAnswers');
-      
-      if (!answersJson || !user) {
-        // Jika tidak ada jawaban atau pengguna, kembali ke awal
+      const quizSlug = sessionStorage.getItem('quizSlug');
+
+      console.log('🚀 Loading page - Data check:', {
+        hasAnswers: !!answersJson,
+        hasQuizSlug: !!quizSlug,
+        hasUser: !!user,
+        answersLength: answersJson ? JSON.parse(answersJson).length : 0
+      });
+
+      if (!answersJson || !quizSlug || !user) {
+        console.error('❌ Missing required data:', { answersJson: !!answersJson, quizSlug: !!quizSlug, user: !!user });
         navigate('/');
         return;
       }
 
       const answers: Answer[] = JSON.parse(answersJson);
+      console.log('📝 Parsed answers:', answers);
 
       try {
         setMessage("Menghitung persona unikmu...");
-        // Panggil fungsi baru untuk memproses jawaban dan menyimpan ke DB
-        const resultId = await processTestAnswers(answers, user.id);
+        
+        console.log('🎯 Calling processTestAnswers with:', { answersCount: answers.length, userId: user.id, quizSlug });
+        const resultId = await processTestAnswers(answers, user.id, quizSlug);
+        console.log('✅ Got result ID:', resultId);
 
         setMessage("Menyiapkan hasil akhir...");
         
-        // Hapus data dari session storage setelah berhasil disimpan
+        // Hapus kedua data dari session storage setelah berhasil
         sessionStorage.removeItem('testAnswers');
+        sessionStorage.removeItem('quizSlug');
 
-        // Arahkan ke halaman hasil dengan ID hasil tes yang baru
+        // Arahkan ke halaman hasil dengan ID dan slug kuis
         setTimeout(() => {
-          navigate(`/results?id=${resultId}`);
+          navigate(`/results?id=${resultId}&quiz=${quizSlug}`);
         }, 1000);
 
       } catch (error) {
-        console.error("Failed to process results:", error);
-        // Arahkan ke halaman error atau kembali ke test
+        console.error("❌ Failed to process results:", error);
+        // Tampilkan error detail ke console
+        if (error instanceof Error) {
+          console.error('Error message:', error.message);
+          console.error('Error stack:', error.stack);
+        }
         navigate('/test');
       }
     };
