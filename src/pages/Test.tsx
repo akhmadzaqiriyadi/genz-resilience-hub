@@ -59,16 +59,14 @@ const Test = () => {
   }, [quizSlug, navigate]);
 
   const handleAnswer = (value: AnswerValue) => {
-    // --- INI PERUBAHANNYA ---
     const newAnswers = [
       ...answers,
       {
         questionId: questions[currentQuestionIndex].id,
         value,
-        questionIndex: currentQuestionIndex, // Simpan indeks pertanyaan saat ini
+        questionIndex: currentQuestionIndex,
       },
     ];
-    // --- AKHIR PERUBAHAN ---
     
     setAnswers(newAnswers);
 
@@ -116,6 +114,7 @@ const Test = () => {
 
         {currentQuestion ? (
           <QuestionCard
+            key={currentQuestion.id} // <-- **INI SOLUSINYA**
             question={currentQuestion}
             currentIndex={currentQuestionIndex}
             totalQuestions={questions.length}

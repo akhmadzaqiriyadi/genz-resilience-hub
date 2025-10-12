@@ -8,6 +8,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 // Layouts & Guards
 import MainLayout from "./layouts/MainLayout";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import AdminLayout from "./layouts/AdminLayout";
+import AdminRoute from "./components/auth/AdminRoute";
+import TestHistory from "./pages/admin/TestHistory"; 
 
 // Pages
 import Index from "./pages/Index";
@@ -23,6 +26,8 @@ import History from "./pages/History";
 import NotFound from "./pages/NotFound";
 import ForgotPassword from "./pages/ForgotPassword";
 import UpdatePassword from "./pages/UpdatePassword";
+import Dashboard from "./pages/admin/Dashboard";
+import UserManagement from "./pages/admin/UserManagement";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +37,15 @@ const App = () => (
       <Toaster />
       <BrowserRouter>
         <Routes>
+          {/* Rute Admin */}
+          <Route element={<AdminRoute />}>
+            <Route element={<AdminLayout />}>
+              <Route path="/admin" element={<Dashboard />} />
+              <Route path="/admin/users" element={<UserManagement />} />
+              <Route path="/admin/test-history" element={<TestHistory />} />
+
+            </Route>
+          </Route>
           {/* Rute dengan Header */}
           <Route element={<MainLayout />}>
             <Route path="/" element={<Index />} />
