@@ -119,8 +119,8 @@ const Index = () => {
 
   const chartConfig = {
     "sangat-puas": { label: "Sangat Puas", color: "hsl(200 100% 45%)" },
-    puas: { label: "Puas", color: "hsl(200 100% 60%)" },
-    "cukup-puas": { label: "Cukup Puas", color: "hsl(200 100% 70%)" },
+    puas: { label: "Puas", color: "hsl(200 100% 70%)" },
+    "cukup-puas": { label: "Cukup Puas", color: "hsl(200 50% 65%)" },
   } satisfies ChartConfig;
 
   // Fungsi untuk render label dengan nama dan persentase
@@ -183,7 +183,7 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section className="container mx-auto px-4 py-20 bg-slate-50">
+      <section className="container mx-auto px-4 py-20">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12 space-y-4">
             <h2 className="text-3xl lg:text-4xl font-bold text-foreground">
@@ -198,7 +198,7 @@ const Index = () => {
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="relative bg-card p-6 rounded-xl shadow-soft border border-border hover:shadow-card transition-all hover:-translate-y-1 animate-fade-in h-48 overflow-hidden"
+                className="relative bg-card p-6 rounded-xl shadow-soft border border-border hover:shadow-card transition-all hover:-translate-y-1 animate-fade-in h-64 overflow-hidden"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <div className="relative z-10">
@@ -212,7 +212,7 @@ const Index = () => {
                 <img
                   src={feature.image}
                   alt={feature.title}
-                  className="absolute -bottom-2 -right-4 w-32 h-auto object-contain z-0 opacity-90"
+                  className="absolute -bottom-2 -right-12 w-64 h-auto object-contain z-0 opacity-90"
                 />
               </div>
             ))}
@@ -244,7 +244,7 @@ const Index = () => {
                       <img src="/cheklist.svg" alt="checklist" className="w-8 h-8 object-contain" />
                     </div>
                   </div>
-                  <div className="bg-card p-6 rounded-xl shadow-soft border border-border flex-1">
+                  <div className="bg-card p-6 rounded-b-xl rounded-r-xl shadow-soft border border-border flex-1">
                     <h3 className="text-lg font-bold text-foreground mb-2">
                       {item.title}
                     </h3>
@@ -300,7 +300,7 @@ const Index = () => {
       </section>
 
       {/* 3 Langkah Simpel Section */}
-      <section className="container mx-auto px-4 py-20 bg-white/50 dark:bg-slate-900/50">
+      <section className="container mx-auto px-4 py-20 dark:bg-slate-900/50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16 space-y-4">
             <h2 className="text-3xl lg:text-4xl font-bold text-foreground">
@@ -370,7 +370,7 @@ const Index = () => {
               Masih ada yang bikin penasaran? Cek di sini.
             </p>
           </div>
-          <div className="bg-card rounded-2xl shadow-soft border border-border p-6 lg:p-8">
+          <div className="bg-white/50 rounded-2xl shadow-soft border border-border p-6 lg:p-8">
             <Accordion type="single" collapsible className="space-y-2">
               {faqs.map((faq, index) => (
                 <AccordionItem
